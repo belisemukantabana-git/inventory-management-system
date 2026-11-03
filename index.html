@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Stockroom — a small inventory management system for tracking products, stock levels and movement history.">
+  <title>Stockroom · Inventory Management</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 12l8-4 8 4v9l-8 4-8-4z' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3Cpath d='M8 12l8 4 8-4M16 16v9' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M6 11l10-5 10 5v10l-10 5-10-5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M6 11l10 5 10-5M16 16v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <div class="brand-text">
+        <h1>Stockroom</h1>
+        <span>Inventory management</span>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <label class="search" for="searchInput">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="search" placeholder="Search name, SKU or category" autocomplete="off" spellcheck="false">
+        <kbd>/</kbd>
+      </label>
+
+      <button class="btn icon-btn" id="btnRefresh" type="button" title="Refresh data" aria-label="Refresh data">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 9a6.5 6.5 0 1 0-1.6 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.8 5.5v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <button class="btn primary" id="btnAddProduct" type="button">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        Add product
+      </button>
+    </div>
+  </header>
+
+  <main class="page" id="main">
+    <section class="kpis" aria-label="Inventory overview">
+      <article class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Products</span>
+          <span class="kpi-icon kpi-icon--indigo">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7l7-3.5L17 7v7l-7 3.5L3 14z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M3 7l7 3.5L17 7M10 10.5V18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+        <strong class="kpi-value" id="kpiProducts">—</strong>
+        <span class="kpi-sub" id="kpiProductsSub">in the catalogue</span>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Units in stock</span>
+          <span class="kpi-icon kpi-icon--blue">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h12v12H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 9h12M9 9v7" stroke="currentColor" stroke-width="1.6"/></svg>
+          </span>
+        </div>
+        <strong class="kpi-value" id="kpiUnits">—</strong>
+        <span class="kpi-sub" id="kpiUnitsSub">across all products</span>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Stock value</span>
+          <span class="kpi-icon kpi-icon--green">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v14M13.5 6.5c0-1.4-1.6-2.2-3.5-2.2S6.5 5.1 6.5 6.5s1.6 2 3.5 2 3.5.6 3.5 2-1.6 2.2-3.5 2.2-3.5-.8-3.5-2.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+        <strong class="kpi-value" id="kpiValue">—</strong>
+        <span class="kpi-sub">retail value of stock on hand</span>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-top">
+          <span class="kpi-label">Needs attention</span>
+          <span class="kpi-icon kpi-icon--amber">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3l7.5 13h-15z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14" r=".9" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <strong class="kpi-value" id="kpiLow">—</strong>
+        <span class="kpi-sub" id="kpiLowSub">at or below reorder level</span>
+      </article>
+    </section>
+
+    <div class="alert" id="alertBanner" hidden>
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3l7.5 13h-15z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14" r=".9" fill="currentColor"/></svg>
+      <span id="alertText"></span>
+      <button class="btn small ghost" id="alertAction" type="button">Show low stock</button>
+    </div>
+
+    <section class="workspace">
+      <div class="panel products-panel">
+        <header class="panel-head">
+          <div class="panel-title">
+            <h2>Products</h2>
+            <p id="resultCount">Loading…</p>
+          </div>
+          <div class="panel-tools">
+            <div class="chips" id="categoryChips" role="group" aria-label="Filter by category"></div>
+            <button class="chip toggle" id="lowOnly" type="button" aria-pressed="false">Low stock only</button>
+            <button class="btn small ghost" id="btnExport" type="button">Export CSV</button>
+          </div>
+        </header>
+
+        <div class="table-wrap">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Category</th>
+                <th scope="col" class="num">Price</th>
+                <th scope="col">Stock</th>
+                <th scope="col" class="num">Reorder at</th>
+                <th scope="col" class="num">Value</th>
+                <th scope="col" class="right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productRows"></tbody>
+          </table>
+        </div>
+
+        <div class="empty" id="tableEmpty" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 8l8 4 8-4M12 12v8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <p class="empty-title" id="emptyTitle">No products yet</p>
+          <p class="empty-text" id="emptyText">Add your first product to start tracking stock.</p>
+          <button class="btn primary" id="emptyAdd" type="button">Add product</button>
+        </div>
+      </div>
+
+      <aside class="panel activity-panel" aria-labelledby="activityTitle">
+        <header class="panel-head">
+          <div class="panel-title">
+            <h2 id="activityTitle">Recent activity</h2>
+            <p>Latest stock movements</p>
+          </div>
+          <button class="btn icon-btn small" id="btnActivityRefresh" type="button" title="Refresh activity" aria-label="Refresh activity">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16.5 9a6.5 6.5 0 1 0-1.6 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.8 5.5v4h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </header>
+        <ol class="activity" id="activityList"></ol>
+      </aside>
+    </section>
+
+    <footer class="page-foot">
+      <span class="conn">
+        <span class="dot" id="connDot"></span>
+        <span id="connText">Connecting to Supabase…</span>
+      </span>
+      <span class="spacer"></span>
+      <span class="foot-note">Stockroom · data stored in Supabase</span>
+    </footer>
+  </main>
+
+  <!-- Product dialog -->
+  <dialog class="dialog" id="productDialog">
+    <form id="productForm" novalidate>
+      <header class="dialog-head">
+        <h2 id="productDialogTitle">Add product</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close dialog">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      <div class="dialog-body">
+        <div class="field-row">
+          <label class="field">
+            <span>SKU</span>
+            <input name="sku" required maxlength="40" placeholder="SKU-1009" autocomplete="off">
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <input name="category" list="categoryList" maxlength="40" placeholder="Electronics" autocomplete="off">
+            <datalist id="categoryList"></datalist>
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Product name</span>
+          <input name="name" required maxlength="80" placeholder="Bluetooth speaker" autocomplete="off">
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Unit price</span>
+            <input name="unit_price" type="number" min="0" step="0.01" required placeholder="0.00" inputmode="decimal">
+          </label>
+          <label class="field">
+            <span>Reorder level</span>
+            <input name="reorder_level" type="number" min="0" step="1" required value="5" inputmode="numeric">
+          </label>
+        </div>
+
+        <label class="field" id="qtyField">
+          <span>Opening stock</span>
+          <input name="quantity" type="number" min="0" step="1" value="0" inputmode="numeric">
+          <small>Saved as an “Initial stock” movement so the history stays complete.</small>
+        </label>
+
+        <p class="form-error" id="productError" role="alert" hidden></p>
+      </div>
+
+      <footer class="dialog-foot">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="productSubmit">Save product</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Stock movement dialog -->
+  <dialog class="dialog dialog--sm" id="moveDialog">
+    <form id="moveForm" novalidate>
+      <header class="dialog-head">
+        <h2 id="moveDialogTitle">Record stock movement</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close dialog">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      <div class="dialog-body">
+        <div class="move-product">
+          <span class="move-product-name" id="moveProductName">—</span>
+          <span class="move-product-meta" id="moveProductMeta">—</span>
+        </div>
+
+        <div class="segmented" role="group" aria-label="Movement type">
+          <button type="button" class="seg active" data-kind="in">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v10M6 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Stock in
+          </button>
+          <button type="button" class="seg" data-kind="out">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 16V6M6 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Stock out
+          </button>
+        </div>
+
+        <label class="field">
+          <span>Quantity</span>
+          <input name="quantity" type="number" min="1" step="1" required value="1" inputmode="numeric">
+          <small id="moveHint">Units added to stock.</small>
+        </label>
+
+        <label class="field">
+          <span>Note <em>optional</em></span>
+          <input name="note" maxlength="120" placeholder="Order #1044, supplier delivery…" autocomplete="off">
+        </label>
+
+        <p class="form-error" id="moveError" role="alert" hidden></p>
+      </div>
+
+      <footer class="dialog-foot">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn primary" id="moveSubmit">Record movement</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Delete confirmation -->
+  <dialog class="dialog dialog--sm" id="deleteDialog">
+    <form id="deleteForm">
+      <header class="dialog-head">
+        <h2>Delete product</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close dialog">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+      <div class="dialog-body">
+        <p class="confirm-text">Delete <strong id="deleteName">this product</strong>?</p>
+        <p class="confirm-sub">Its stock history will be removed too. This cannot be undone.</p>
+        <p class="form-error" id="deleteError" role="alert" hidden></p>
+      </div>
+      <footer class="dialog-foot">
+        <button type="button" class="btn ghost" data-close>Cancel</button>
+        <button type="submit" class="btn danger" id="deleteSubmit">Delete product</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
